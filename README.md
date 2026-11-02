@@ -235,14 +235,33 @@ There is deliberately no public endpoint for reading contact submissions. The AP
 
 ## Deployment
 
-### Frontend
+### Frontend on Vercel
 
-Deploy `client` to Netlify, Vercel, Cloudflare Pages, or a similar static host:
+The repository includes a root [`vercel.json`](./vercel.json), so it can be imported directly into Vercel without moving the project files:
 
+1. Import the GitHub repository into Vercel.
+2. Keep the project root set to the repository root.
+3. Add the environment variable `VITE_API_URL` with the deployed API base URL, for example `https://api.example.com/api`.
+4. Deploy.
+
+The configuration installs dependencies from `client/package-lock.json`, builds `client`, publishes `client/dist`, and rewrites client-side routes such as `/projects/:slug`, `/blog/:slug`, and `/admin/*` to `index.html`.
+
+The frontend is also compatible with a Vercel project whose **Root Directory** is set to `client`; in that setup use:
+
+- Install command: `npm ci`
 - Build command: `npm run build`
-- Publish directory: `client/dist`
-- Set `VITE_API_URL` to the deployed API base URL.
-- Configure SPA fallback so `/projects/:slug`, `/blog/:slug`, and `/admin/*` resolve to `index.html`.
+- Output directory: `dist`
+- Framework preset: `Vite`
+
+### Backend
+
+Vercel hosts the frontend configuration in this repository. Deploy the Express/MongoDB API as a separate Node service (Render, Railway, Fly.io, or another Node host), then set that public HTTPS URL in Vercel as `VITE_API_URL`.
+
+- Install command: `npm install`
+- Start command: `npm start`
+- Set `NODE_ENV=production`.
+- Set `MONGODB_URI`, `CLIENT_ORIGIN` to the Vercel URL, and all three admin authentication variables.
+- Run `npm run seed` once against the production database.
 
 ### Backend
 
