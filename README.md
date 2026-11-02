@@ -1,227 +1,293 @@
-# RUHUL.DEV — Beyond the Interface
+# RUHUL.DEV
 
-Immersive 3D developer portfolio for **Ruhul Ma Ani Mazumder** (Ruhul): a React + Vite front end with React Three Fiber scenes, and a Node.js/Express + MongoDB API for project data and contact submissions.
+> **Beyond the interface.**
 
-```
-ruhul-3d-portfolio/
-  client/   React 19 · Vite 8 · Tailwind CSS 4 · Three.js / R3F / drei · Framer Motion · React Router · react-markdown
-  server/   Node 20+ · Express 5 · Mongoose 9 · Zod 4 · Helmet · CORS · express-rate-limit · bcryptjs · jsonwebtoken
-```
+Personal portfolio and content platform for **Ruhul Ma Ani Mazumder** — a Computer Science and Engineering student and aspiring full-stack developer.
 
-## Features
+RUHUL.DEV combines a cinematic React frontend with a Node.js API, MongoDB-backed content, a protected admin workspace, a Markdown blog, and a live theme editor.
 
-- Cinematic hero: a GPU particle cloud (~6k points, custom shader) that morphs between a sphere, a torus knot, a `</>` glyph and your initials, with one clickable marker per featured project orbiting it (click → project page).
-- Skills flow field: skill chips (real, focusable buttons) drift along Perlin-noise currents over a canvas of soft streaks; picking a category gathers its chips into a cluster and dims the rest. 2D canvas only, so it runs everywhere; reduced motion gets a static grouped map.
-- Graceful degradation: WebGL detection, device-tier heuristics, `prefers-reduced-motion`, error boundaries and CSS/SVG fallbacks. Content never depends on 3D.
-- Projects from the API with a local fallback dataset; list page with category/technology filters; detail routes with unique titles.
-- Contact form validated on the client and server (Zod), honeypot + rate limiting, persisted privately in MongoDB.
-- **Admin panel** at `/admin`: single-owner login (bcrypt + httpOnly JWT cookie), project CRUD with publish/feature toggles and drag-free reordering, private contact inbox, Markdown blog editor with live preview, and a theme editor (colours, fonts, 3D toggles) that restyles the whole site live.
-- **Blog** at `/blog`: published posts with tags, reading time and GitHub-flavoured Markdown (raw HTML stripped).
-- Semantic HTML, skip link, keyboard-operable navigation, visible focus, 44px touch targets, no horizontal overflow down to 320px.
+## What is inside
 
-## Quick start
+### Public experience
 
-Prerequisites: Node.js 20+ and a MongoDB instance (local or Atlas).
+- Particle-morph hero: a custom GPU shader morphs thousands of points through a sphere, torus knot, `</>` glyph, and personal initials.
+- Clickable project markers orbit the hero particle cloud and link to project detail pages.
+- Perlin-noise skills flow field with glowing, keyboard-focusable skill chips.
+- Project listing with category and technology filters.
+- Markdown blog with tags, reading time, pagination, and safe rendering with raw HTML disabled.
+- Contact form with client/server validation, honeypot protection, rate limiting, and private MongoDB persistence.
+- Reduced-motion, low-tier-device, WebGL-error, and no-API fallbacks.
+- Accessible navigation, skip links, visible focus states, semantic HTML, and responsive layouts down to 320px.
 
-```bash
-# Terminal 1 – API
-cd server
-cp .env.example .env        # edit MONGODB_URI if needed
-npm install
-npm run seed                # inserts the three initial projects (safe to re-run)
-npm run dev                 # http://localhost:5000
+### Private admin workspace
 
-# Terminal 2 – web app
-cd client
-cp .env.example .env        # VITE_API_URL=http://localhost:5000/api
-npm install
-npm run dev                 # http://localhost:5173
-```
+Open `/admin` after configuring the server credentials:
 
-The front end works without the API (it falls back to `client/src/data/fallbackProjects.js` and hides the contact form, blog and admin when `VITE_API_URL` is empty). When the API is reachable but MongoDB is down, the API returns honest `503` responses and the UI shows error states.
+- **Overview** — content counts and recent contact messages.
+- **Projects** — create, edit, publish, feature, reorder, and delete.
+- **Blog** — write Markdown, preview it, save drafts, publish, and add tags or cover image URLs.
+- **Inbox** — read, review, archive, reply by email, and delete contact submissions.
+- **Theme** — edit colours, fonts, hero text, 3D/animation toggles, and preview changes live.
 
-### Enable the admin panel
+The admin account uses a bcrypt password hash and an HTTP-only JWT cookie. Admin features remain disabled unless all required authentication variables are configured.
 
-```bash
-cd server
-npm run admin:hash -- "a strong password of 12+ characters"   # prints ADMIN_PASSWORD_HASH=...
-node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"   # JWT_SECRET
-```
+## Tech stack
 
-Put `ADMIN_EMAIL`, the printed `ADMIN_PASSWORD_HASH` and `JWT_SECRET` into `server/.env`, restart the API and open `http://localhost:5173/admin`. Leave all three empty to disable admin features entirely (`/api/health` reports `admin: "disabled"`).
-
-## Scripts
-
-| Location | Script | Purpose |
-| --- | --- | --- |
-| `client` | `npm run dev` | Vite dev server |
-| `client` | `npm run build` | Production build to `client/dist` |
-| `client` | `npm run preview` | Serve the production build locally |
-| `client` | `npm run lint` | ESLint |
-| `server` | `npm run dev` | Nodemon dev server |
-| `server` | `npm start` | Production start |
-| `server` | `npm run seed` | Insert initial projects (skips slugs that already exist) |
-| `server` | `npm run seed:force` | Overwrite the three seeded projects with the script data |
-| `server` | `npm run admin:hash -- "password"` | Print a bcrypt hash for `ADMIN_PASSWORD_HASH` |
-| `server` | `npm test` | API tests against an in-memory MongoDB (`mongodb-memory-server`, dev-only) |
-
-## Environment variables
-
-`client/.env`
-
-| Variable | Example | Notes |
-| --- | --- | --- |
-| `VITE_API_URL` | `http://localhost:5000/api` | Public API base URL. Leave empty for a static, API-less deployment. Never put secrets in `VITE_` variables. |
-
-`server/.env`
-
-| Variable | Example | Notes |
-| --- | --- | --- |
-| `PORT` | `5000` | HTTP port |
-| `NODE_ENV` | `development` | `development` \| `test` \| `production` |
-| `MONGODB_URI` | `mongodb://127.0.0.1:27017/ruhul_portfolio` | Required. Use an Atlas URI in production. |
-| `CLIENT_ORIGIN` | `http://localhost:5173` | Comma-separated list of allowed CORS origins |
-| `ADMIN_EMAIL` | `you@example.com` | Optional. Admin login email. |
-| `ADMIN_PASSWORD_HASH` | `$2a$12$…` | Optional. bcrypt hash from `npm run admin:hash`. |
-| `JWT_SECRET` | 32+ random chars | Optional. Signs the admin session cookie. |
-| `ADMIN_SESSION_DAYS` | `7` | Admin session lifetime in days (1–90). |
-
-The three `ADMIN_*`/`JWT_SECRET` variables must be set together; setting only some of them stops the server with a clear message. Missing or malformed variables stop the server at startup. `.env` files are git-ignored; only `.env.example` is committed.
-
-## API
-
-Base path: `/api`. Every response has the shape `{ success, message, data? | errors? }`.
-
-| Method | Route | Description |
-| --- | --- | --- |
-| `GET` | `/health` | Liveness. `data.status` is `ok` when MongoDB is connected, `degraded` otherwise. |
-| `GET` | `/projects` | Published projects, featured first then by `order`. Optional query: `featured=true|false`, `category`, `technology` (case-insensitive exact match). |
-| `GET` | `/projects/:slug` | One published project; `404` if unknown or unpublished; `400` for an invalid slug. |
-| `POST` | `/contact` | Body: `{ name, email, subject?, message, website? }`. `website` is a honeypot and must stay empty. `201` on persistence, `400` with `errors[]` on validation failure, `429` after 5 submissions/hour/IP, `503` when the database is down. |
-| `GET` | `/posts` | Published blog posts (newest first) without `content`. Query: `tag`, `page`, `limit` (≤50). Returns `{ items, total, page, pages, tags }`. |
-| `GET` | `/posts/:slug` | One published post including Markdown `content`. |
-| `GET` | `/settings/theme` | Current site theme merged over defaults: `{ theme, customized, updatedAt }`. |
-
-### Admin API (`/api/admin`, cookie session)
-
-| Method | Route | Description |
-| --- | --- | --- |
-| `POST` | `/auth/login` | `{ email, password }` → sets the `ruhul_admin` httpOnly cookie. 10 attempts / 15 min / IP. |
-| `POST` | `/auth/logout` · `GET /auth/me` | Clear / inspect the session. |
-| `GET` | `/overview` | Counts for projects, posts and inbox plus the five latest messages. |
-| `GET` `POST` | `/projects` | All projects (including drafts) · create. |
-| `GET` `PUT` `PATCH` `DELETE` | `/projects/:id` | Read · replace · partial update (e.g. `{ published: true }`) · delete. |
-| `PUT` | `/projects/order` | `{ ids: [] }` → sets `order` by position. |
-| `GET` | `/contacts` | Inbox with `status`, `page`, `limit` filters and per-status counts. |
-| `GET` `PATCH` `DELETE` | `/contacts/:id` | Read · set `{ status: new\|reviewed\|archived }` · delete. |
-| `GET` `POST` | `/posts` · `GET` `PUT` `PATCH` `DELETE` `/posts/:id` | Blog CRUD. Publishing sets `publishedAt`; `readingMinutes` is derived from content. |
-| `GET` `PUT` `DELETE` | `/settings/theme` | Read (with defaults and font options) · save · reset. |
-
-Admin routes return `401` without a valid cookie, `403` for state-changing requests from a non-allowed `Origin`, `409` on duplicate slugs and `503` when admin is not configured. Admin bodies may be up to 512 KB (blog posts); public bodies stay at 32 KB.
-
-There is no public endpoint that reads contact submissions. Security headers (Helmet), explicit CORS with credentials, JSON body limits, general API rate limit (300 req / 15 min) and centralized error handling are applied globally. Stack traces are never sent to clients.
-
-### Project record
-
-```jsonc
-{
-  "id": "…", "title": "TeamForge", "slug": "teamforge",
-  "summary": "…", "description": "…", "purpose": "…",
-  "category": "Full-stack platform", "status": "prototype | in-progress | completed",
-  "technologies": [], "features": [], "implementationNotes": [], "challenges": [],
-  "role": "…", "repositoryUrl": "https://…", "liveUrl": "https://…", "coverImage": "…",
-  "featured": true, "published": true, "order": 1,
-  "createdAt": "…", "updatedAt": "…"
-}
-```
-
-## Editing content
-
-Most content is now managed from the admin panel at `/admin`:
-
-| What | Where |
+| Layer | Technologies |
 | --- | --- |
-| Projects (create, edit, publish, feature, reorder, delete) | Admin → Projects |
-| Blog posts (Markdown, tags, cover image, draft/published) | Admin → Blog |
-| Contact submissions (read, review, archive, delete) | Admin → Inbox |
-| Site colours, fonts, hero eyebrow text, 3D hero / animated skills toggles | Admin → Theme |
-
-Still edited in code (rarely changes):
-
-| What | Where |
-| --- | --- |
-| Name, headline, about text, education, social links, resume URL, hero initials | `client/src/data/profile.js` |
-| Skills and categories | `client/src/data/skills.js` |
-| Journey / timeline | `client/src/data/journey.js` |
-| Project fallback data (used when the API is unavailable) | `client/src/data/fallbackProjects.js` |
-| Project seed data (initial database content) | `server/scripts/seedProjects.js` |
-| Profile picture | `client/public/images/profile.png` |
-| Default theme values | `client/src/features/theme/themeDefaults.js` and `server/src/modules/settings/settings.schema.js` (keep in sync) |
-
-Links left as empty strings (`email`, `github`, `linkedin`, `resume`, `repositoryUrl`, `liveUrl`) are hidden rather than rendered as dead links.
+| Frontend | React 19, Vite 8, React Router, Tailwind CSS 4, Framer Motion |
+| Visuals | Three.js, React Three Fiber, custom GLSL particle shader, Canvas 2D flow field |
+| Content | `react-markdown`, `remark-gfm` |
+| Backend | Node.js 20+, Express 5, Mongoose 9, Zod 4 |
+| Security | Helmet, explicit CORS, rate limiting, bcryptjs, JWT, HTTP-only cookies |
+| Testing | Node test runner, MongoDB Memory Server |
 
 ## Project structure
 
-```
-client/src
-  app/App.jsx                 routes
-  components/layout           Navbar, Footer, Layout, ScrollManager, PageContainer
-  components/ui               Button, Badge, SectionHeading, LoadingState, ErrorState, Reveal
-  components/three            HeroScene (particle morph), particleShapes, HeroVisual, SceneFallback, SceneErrorBoundary
-  features/home               HomePage, HeroSection
-  features/projects           ProjectsSection, ProjectsPage, ProjectDetailPage, ProjectCard, ProjectGrid, projectService, useProjects
-  features/skills             SkillsSection, SkillsFlowField (canvas + DOM chips)
-  features/about              AboutSection, JourneySection
-  features/contact            ContactSection, contactSchema, contactService
-  features/blog               BlogPage, BlogPostPage, blogService, useBlog
-  features/theme              ThemeProvider (applies CSS variables + fonts), themeContext, themeDefaults
-  features/admin              AdminApp (lazy /admin/*), AdminAuthProvider, AdminLayout, RequireAdmin, adminApi, pages/, components/
-  features/notfound           NotFoundPage
-  hooks/                      usePrefersReducedMotion, useDeviceCapability, useInView, useDocumentMeta
-  lib/                        api.js (fetch wrapper, sends cookies), scroll.js
-  data/                       editable content
-  styles/index.css            Tailwind 4 theme + base styles + Markdown typography
-
-server/src
-  server.js, app.js
-  config/   env.js (Zod-validated), db.js
-  middleware/ validate, rateLimit, requireDatabase, requireAdmin, notFound, errorHandler
-  modules/auth       login/logout/me · bcrypt + JWT cookie
-  modules/projects   model · schema · service · controller · routes · admin controller/routes
-  modules/contact    model · schema · service · controller · routes · admin controller/routes
-  modules/posts      model · schema · service · controller · routes (public + admin)
-  modules/settings   model · schema (theme defaults) · service · routes (public + admin)
-  routes/admin.routes.js   mounts every admin router behind requireAdmin
-  utils/    ApiError, response
-server/scripts/seedProjects.js, hashPassword.js
-server/tests/api.test.js
+```text
+ruhul-3d-portfolio/
+├── client/                 React + Vite frontend
+│   ├── public/              Static assets and profile image
+│   └── src/
+│       ├── app/             Application routes
+│       ├── components/      Layout, UI, particle hero, fallbacks
+│       ├── data/             Profile, skills, journey, fallback projects
+│       ├── features/
+│       │   ├── admin/        Protected admin application
+│       │   ├── blog/         Public blog pages and data hooks
+│       │   ├── projects/     Public project pages and API integration
+│       │   ├── skills/       Flow-field skills visualization
+│       │   └── theme/        Runtime theme provider and defaults
+│       └── styles/           Tailwind theme and global styles
+├── server/                 Express + MongoDB API
+│   ├── scripts/             Seed and password-hash utilities
+│   ├── src/
+│   │   ├── config/           Environment and database configuration
+│   │   ├── middleware/       Validation, auth, rate limits, errors
+│   │   └── modules/          Auth, projects, contacts, posts, settings
+│   └── tests/               API integration tests
+├── profile.png             Source profile image
+├── Ruhul_SRS.md             Product requirements document
+└── README.md
 ```
 
-## Performance notes
+## Local development
 
-- Three.js, R3F and drei are split into a separate chunk (`three-*.js`, ~319 KB gzipped) that is only downloaded when a scene actually mounts. The content shell is ~81 KB gzipped. Vite reports the large chunk as a warning; this is intentional.
-- The admin panel (~14 KB gzipped) and the Markdown renderer (~49 KB gzipped, shared by `/blog/:slug` and the admin editor) are lazy-loaded; normal visitors never download them.
-- The hero canvas pauses rendering (`frameloop="never"`) when scrolled out of view; the skills flow field only animates while near the viewport. Particle shapes are generated once per mount (text glyphs are rasterised from an offscreen canvas).
-- Device pixel ratio is capped (1.6 desktop / 1.25 constrained). Low-tier devices, `prefers-reduced-motion`, missing WebGL and runtime errors all fall back to CSS/SVG. The owner can also force the fallbacks from Admin → Theme.
+### Prerequisites
+
+- Node.js 20 or newer
+- MongoDB locally or a MongoDB Atlas cluster
+
+### 1. Start the API
+
+```powershell
+cd server
+Copy-Item .env.example .env
+npm install
+npm run seed
+npm run dev
+```
+
+The API runs at `http://localhost:5000`.
+
+### 2. Start the frontend
+
+Open a second terminal:
+
+```powershell
+cd client
+Copy-Item .env.example .env
+npm install
+npm run dev
+```
+
+The site runs at `http://localhost:5173`.
+
+For the frontend to use the API, `client/.env` should contain:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+If `VITE_API_URL` is empty, the portfolio still renders using local fallback project data. API-dependent features — contact submission, blog, theme synchronisation, and admin — are hidden or show an explicit unavailable state.
+
+## Configure the admin panel
+
+Generate a password hash:
+
+```powershell
+cd server
+npm run admin:hash -- "your strong password of at least 12 characters"
+```
+
+Generate a signing secret:
+
+```powershell
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+```
+
+Add the resulting values to `server/.env`:
+
+```env
+ADMIN_EMAIL=you@example.com
+ADMIN_PASSWORD_HASH=$2b$12$...
+JWT_SECRET=your-32-character-or-longer-random-secret
+ADMIN_SESSION_DAYS=7
+```
+
+Restart the API and visit `http://localhost:5173/admin`.
+
+Leave `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, and `JWT_SECRET` empty to disable admin access. Never commit `.env` files.
+
+## Environment variables
+
+### Frontend: `client/.env`
+
+| Variable | Example | Description |
+| --- | --- | --- |
+| `VITE_API_URL` | `http://localhost:5000/api` | Public API base URL. Leave empty for a static frontend-only deployment. |
+
+### Backend: `server/.env`
+
+| Variable | Example | Description |
+| --- | --- | --- |
+| `PORT` | `5000` | HTTP port. |
+| `NODE_ENV` | `development` | `development`, `test`, or `production`. |
+| `MONGODB_URI` | `mongodb://127.0.0.1:27017/ruhul_portfolio` | MongoDB connection string. |
+| `CLIENT_ORIGIN` | `http://localhost:5173` | Comma-separated allowed frontend origins. |
+| `ADMIN_EMAIL` | `you@example.com` | Optional admin login email. |
+| `ADMIN_PASSWORD_HASH` | `$2b$12$...` | Optional bcrypt password hash. |
+| `JWT_SECRET` | random 32+ character string | Optional JWT signing secret. |
+| `ADMIN_SESSION_DAYS` | `7` | Admin cookie lifetime, from 1 to 90 days. |
+
+The three admin authentication values must be configured together. Invalid or incomplete configuration stops the server with a readable error.
+
+## Available commands
+
+Run each command from its listed directory.
+
+| Directory | Command | Purpose |
+| --- | --- | --- |
+| `client` | `npm run dev` | Start the Vite development server. |
+| `client` | `npm run lint` | Run ESLint. |
+| `client` | `npm run build` | Create the production build in `client/dist`. |
+| `client` | `npm run preview` | Preview the production build locally. |
+| `server` | `npm run dev` | Start the API with Nodemon. |
+| `server` | `npm start` | Start the API without Nodemon. |
+| `server` | `npm run seed` | Insert the initial projects without overwriting existing records. |
+| `server` | `npm run seed:force` | Replace the seeded project records. |
+| `server` | `npm run admin:hash -- "password"` | Generate a bcrypt admin password hash. |
+| `server` | `npm test` | Run the 19 API integration tests. |
+
+## API overview
+
+All responses use:
+
+```json
+{
+  "success": true,
+  "message": "Human-readable result",
+  "data": {}
+}
+```
+
+### Public routes
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/health` | API and database health. |
+| `GET` | `/api/projects` | Published projects with optional filters. |
+| `GET` | `/api/projects/:slug` | One published project. |
+| `POST` | `/api/contact` | Validate and persist a contact submission. |
+| `GET` | `/api/posts` | Published blog posts with tag and pagination filters. |
+| `GET` | `/api/posts/:slug` | One published Markdown post. |
+| `GET` | `/api/settings/theme` | Current public theme settings. |
+
+### Protected admin routes
+
+All routes below require the `ruhul_admin` HTTP-only cookie:
+
+| Area | Routes |
+| --- | --- |
+| Auth | `POST /api/admin/auth/login`, `POST /api/admin/auth/logout`, `GET /api/admin/auth/me` |
+| Overview | `GET /api/admin/overview` |
+| Projects | `GET/POST /api/admin/projects`, `GET/PUT/PATCH/DELETE /api/admin/projects/:id`, `PUT /api/admin/projects/order` |
+| Inbox | `GET /api/admin/contacts`, `GET/PATCH/DELETE /api/admin/contacts/:id` |
+| Blog | `GET/POST /api/admin/posts`, `GET/PUT/PATCH/DELETE /api/admin/posts/:id` |
+| Theme | `GET/PUT/DELETE /api/admin/settings/theme` |
+
+There is deliberately no public endpoint for reading contact submissions. The API applies Helmet, explicit credentialed CORS, body-size limits, general rate limiting, contact rate limiting, login rate limiting, validation, and centralized error handling.
+
+## Content management
+
+| Content | Manage it from |
+| --- | --- |
+| Projects | Admin → Projects |
+| Blog posts | Admin → Blog |
+| Contact submissions | Admin → Inbox |
+| Colours, fonts, hero settings | Admin → Theme |
+| Profile name, bio, education, social links | `client/src/data/profile.js` |
+| Hero initials | `client/src/data/profile.js` |
+| Skills and categories | `client/src/data/skills.js` |
+| Journey timeline | `client/src/data/journey.js` |
+| API-offline project fallback | `client/src/data/fallbackProjects.js` |
+| Profile image | `client/public/images/profile.png` |
 
 ## Deployment
 
-**Frontend (Netlify, Vercel, Cloudflare Pages, …)**
-- Build command: `npm run build` in `client`; publish `client/dist`.
-- Set `VITE_API_URL` to the deployed API, e.g. `https://api.example.com/api`.
-- Enable SPA fallback so `/projects/:slug` works when opened directly (Netlify: `/* /index.html 200` in `_redirects`; Vercel: rewrite to `/index.html`).
+### Frontend
 
-**Backend (Render, Railway, Fly.io, …)**
-- Root: `server`. Build: `npm install`. Start: `npm start`.
-- Environment: `PORT` (usually provided), `NODE_ENV=production`, `MONGODB_URI` (Atlas), `CLIENT_ORIGIN=https://your-frontend-domain`, plus `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `JWT_SECRET` for the admin panel.
-- In production the admin cookie is `Secure; SameSite=None`, so both the site and the API must be served over HTTPS (required when they live on different domains).
+Deploy `client` to Netlify, Vercel, Cloudflare Pages, or a similar static host:
+
+- Build command: `npm run build`
+- Publish directory: `client/dist`
+- Set `VITE_API_URL` to the deployed API base URL.
+- Configure SPA fallback so `/projects/:slug`, `/blog/:slug`, and `/admin/*` resolve to `index.html`.
+
+### Backend
+
+Deploy `server` to Render, Railway, Fly.io, or another Node host:
+
+- Install command: `npm install`
+- Start command: `npm start`
+- Set `NODE_ENV=production`.
+- Set `MONGODB_URI`, `CLIENT_ORIGIN`, and all three admin authentication variables.
 - Run `npm run seed` once against the production database.
 
-**Database**: MongoDB Atlas with IP access restricted to the API host and a dedicated database user.
+In production, the admin cookie is `Secure` and `SameSite=None`. The frontend and API must therefore use HTTPS when deployed on different domains. Restrict MongoDB Atlas network access to the API host and use a dedicated database user.
 
-After deploying verify: HTTPS on both origins, `GET /api/health` returns `status: ok` and `admin: enabled`, `GET /api/projects` returns data, CORS origin matches, a contact submission is stored, you can sign in at `/admin`, and the 3D hero or its fallback renders on a real phone.
+After deployment, verify:
 
-## Testing
+1. `/api/health` returns `status: ok` and `admin: enabled`.
+2. `/api/projects` returns seeded content.
+3. CORS allows only the deployed frontend origin.
+4. `/admin` accepts the configured credentials.
+5. A contact submission appears in the private inbox.
+6. `/blog` and a published post load directly.
+7. The particle hero and skills field or their fallbacks render on a real phone.
 
-- `client`: `npm run lint` and `npm run build` must pass.
-- `server`: `npm test` runs 19 integration tests (health, project listing/filters/sorting, unpublished hiding, slug validation, idempotent seeding, contact validation/honeypot/persistence/privacy/rate limiting, CORS, 404s, admin login/session/CSRF-origin check, project CRUD + reorder, inbox, blog publishing, theme save/reset, logout) against an in-memory MongoDB. The first run downloads a `mongod` binary.
+## Performance and accessibility
+
+- Three.js is lazy-loaded and split into its own chunk.
+- The admin application and Markdown renderer are lazy-loaded.
+- The hero pauses when outside the viewport.
+- The skills flow field animates only while near the viewport.
+- Device pixel ratio is capped for constrained devices.
+- Reduced-motion users receive static particle and skill layouts.
+- WebGL failures fall back without hiding content.
+- Raw HTML is disabled when rendering Markdown.
+- Interactive skill chips remain keyboard-focusable.
+
+## Validation
+
+The current project passes:
+
+```text
+client: npm run lint
+client: npm run build
+server: npm test — 19 passed, 0 failed
+```
+
+## License
+
+No license has been selected yet. All rights reserved by the project owner unless a license is added to the repository.
