@@ -106,10 +106,10 @@ The site runs at `http://localhost:5173`.
 For the frontend to use the API, `client/.env` should contain:
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+PUBLIC_API_URL=http://localhost:5000/api
 ```
 
-If `VITE_API_URL` is empty, the portfolio still renders using local fallback project data. API-dependent features — contact submission, blog, theme synchronisation, and admin — are hidden or show an explicit unavailable state.
+If `PUBLIC_API_URL` is empty, the portfolio still renders using local fallback project data. API-dependent features — contact submission, blog, theme synchronisation, and admin — are hidden or show an explicit unavailable state.
 
 ## Configure the admin panel
 
@@ -145,7 +145,7 @@ Leave `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, and `JWT_SECRET` empty to disable ad
 
 | Variable | Example | Description |
 | --- | --- | --- |
-| `VITE_API_URL` | `http://localhost:5000/api` | Public API base URL. Leave empty for a static frontend-only deployment. |
+| `PUBLIC_API_URL` | `http://localhost:5000/api` | Public API base URL. This value is bundled into the browser; it must never contain credentials or secrets. |
 
 ### Backend: `server/.env`
 
@@ -241,7 +241,7 @@ The repository includes a root [`vercel.json`](./vercel.json), so it can be impo
 
 1. Import the GitHub repository into Vercel.
 2. Keep the project root set to the repository root.
-3. Add the environment variable `VITE_API_URL` with the deployed API base URL, for example `https://api.example.com/api`.
+3. Add the environment variable `PUBLIC_API_URL` with the deployed API base URL, for example `https://api.example.com/api`. This is intentionally public and is not a secret.
 4. Deploy.
 
 The configuration installs dependencies from `client/package-lock.json`, builds `client`, publishes `client/dist`, and rewrites client-side routes such as `/projects/:slug`, `/blog/:slug`, and `/admin/*` to `index.html`.
@@ -255,7 +255,7 @@ The frontend is also compatible with a Vercel project whose **Root Directory** i
 
 ### Backend
 
-Vercel hosts the frontend configuration in this repository. Deploy the Express/MongoDB API as a separate Node service (Render, Railway, Fly.io, or another Node host), then set that public HTTPS URL in Vercel as `VITE_API_URL`.
+Vercel hosts the frontend configuration in this repository. Deploy the Express/MongoDB API as a separate Node service (Render, Railway, Fly.io, or another Node host), then set that public HTTPS URL in Vercel as `PUBLIC_API_URL`.
 
 - Install command: `npm install`
 - Start command: `npm start`

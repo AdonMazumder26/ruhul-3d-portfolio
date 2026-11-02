@@ -731,7 +731,7 @@ Do not seed invented repository URLs, demo URLs, metrics, or dates. Use optional
 ## 11.1 Frontend `.env.example`
 
 ```dotenv
-VITE_API_URL=http://localhost:5000/api
+PUBLIC_API_URL=http://localhost:5000/api
 ```
 
 Only variables intentionally exposed to the browser may use the `VITE_` prefix. Never put MongoDB credentials, private API keys, or secrets in frontend variables.
@@ -1037,7 +1037,7 @@ The exact scripts must match the actual `package.json` files.
 
 ## 17.1 Frontend
 
-The frontend must be deployable to a static hosting service such as Netlify or Vercel. Configure the production API base URL through `VITE_API_URL`.
+The frontend must be deployable to a static hosting service such as Netlify or Vercel. Configure the public production API base URL through `PUBLIC_API_URL`; this value must not contain credentials or secrets.
 
 ## 17.2 Backend
 

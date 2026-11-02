@@ -1,4 +1,4 @@
-const rawBase = import.meta.env.VITE_API_URL?.trim() ?? ''
+const rawBase = import.meta.env.PUBLIC_API_URL?.trim() ?? ''
 
 export const API_BASE_URL = rawBase.replace(/\/+$/, '')
 export const apiConfigured = API_BASE_URL.length > 0

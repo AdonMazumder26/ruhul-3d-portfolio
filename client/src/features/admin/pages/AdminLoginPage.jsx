@@ -60,7 +60,7 @@ export function AdminLoginPage() {
 
         {!apiConfigured ? (
           <p className="mt-6 rounded-lg border border-orange/40 bg-orange/10 p-3 text-sm text-text">
-            <code>VITE_API_URL</code> is not set, so the admin panel cannot reach the API.
+            <code>PUBLIC_API_URL</code> is not set, so the admin panel cannot reach the API.
           </p>
         ) : unavailable && !error ? (
           <p className="mt-6 rounded-lg border border-border bg-elevated/40 p-3 text-sm text-muted">

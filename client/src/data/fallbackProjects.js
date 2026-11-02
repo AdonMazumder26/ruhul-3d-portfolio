@@ -1,5 +1,5 @@
 /**
- * Local fallback dataset used when the API is unreachable or VITE_API_URL is unset.
+ * Local fallback dataset used when the API is unreachable or PUBLIC_API_URL is unset.
  * Keep in sync with server/scripts/seedProjects.js.
  * Only verified facts: no URLs, dates or metrics are included until confirmed.
  */
