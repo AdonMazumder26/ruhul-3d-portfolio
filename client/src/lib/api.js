@@ -1,6 +1,19 @@
 const rawBase = import.meta.env.PUBLIC_API_URL?.trim() ?? ''
 
-export const API_BASE_URL = rawBase.replace(/\/+$/, '')
+function normalizeApiBase(value) {
+  if (!value) return ''
+
+  try {
+    const url = new URL(value)
+    if (url.pathname === '' || url.pathname === '/') url.pathname = '/api'
+    return url.toString().replace(/\/+$/, '')
+  } catch {
+    // Keep relative/test values usable while still removing duplicate slashes.
+    return value.replace(/\/+$/, '')
+  }
+}
+
+export const API_BASE_URL = normalizeApiBase(rawBase)
 export const apiConfigured = API_BASE_URL.length > 0
 
 export class ApiRequestError extends Error {

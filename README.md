@@ -145,7 +145,7 @@ Leave `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, and `JWT_SECRET` empty to disable ad
 
 | Variable | Example | Description |
 | --- | --- | --- |
-| `PUBLIC_API_URL` | `http://localhost:5000/api` | Public API base URL. This value is bundled into the browser; it must never contain credentials or secrets. |
+| `PUBLIC_API_URL` | `http://localhost:5000/api` | Public API base URL. Include `/api` (the client also normalizes a host-only URL). This value is bundled into the browser; it must never contain credentials or secrets. |
 
 ### Backend: `server/.env`
 
@@ -241,7 +241,7 @@ The repository includes a root [`vercel.json`](./vercel.json), so it can be impo
 
 1. Import the GitHub repository into Vercel.
 2. Keep the project root set to the repository root.
-3. Add the environment variable `PUBLIC_API_URL` with the deployed API base URL, for example `https://api.example.com/api`. This is intentionally public and is not a secret.
+3. Add the environment variable `PUBLIC_API_URL` with the deployed API base URL, for example `https://api.example.com/api`. This is intentionally public and is not a secret. A host-only value is also normalized to `/api`.
 4. Deploy.
 
 The configuration installs dependencies from `client/package-lock.json`, builds `client`, publishes `client/dist`, and rewrites client-side routes such as `/projects/:slug`, `/blog/:slug`, and `/admin/*` to `index.html`.
