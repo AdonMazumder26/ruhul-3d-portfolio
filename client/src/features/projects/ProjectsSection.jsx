@@ -16,7 +16,7 @@ export function ProjectsSection({ status, projects, retry }) {
             id="projects-title"
             eyebrow="Selected projects"
             title="Three landmarks in the universe"
-            description="Each orbiting marker in the hero scene points to one of these projects. Everything is also here as plain, readable HTML."
+            description="Each marker orbiting the hero particle cloud points to one of these projects. Everything is also here as plain, readable HTML."
           />
           <Button to="/projects" variant="secondary" className="shrink-0">
             All projects

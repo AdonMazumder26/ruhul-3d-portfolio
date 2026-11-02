@@ -83,6 +83,32 @@
     @apply fixed left-4 top-4 z-[100] -translate-y-24 rounded-md bg-cyan px-4 py-2 font-medium text-bg transition-transform focus:translate-y-0;
   }
 
+  /* Skill chips in the flow field. */
+  .skill-chip {
+    @apply inline-flex min-h-8 cursor-default select-none items-center whitespace-nowrap rounded-full border bg-surface/85 px-3 text-[13px] font-medium text-text backdrop-blur-sm transition-[opacity,box-shadow,border-color,color] duration-500;
+  }
+  .skill-chip--cyan {
+    border-color: color-mix(in oklab, var(--color-cyan) 45%, transparent);
+    box-shadow: 0 0 0 0 transparent, 0 0 18px -6px color-mix(in oklab, var(--color-cyan) 60%, transparent);
+  }
+  .skill-chip--orange {
+    border-color: color-mix(in oklab, var(--color-orange) 45%, transparent);
+    box-shadow: 0 0 18px -6px color-mix(in oklab, var(--color-orange) 60%, transparent);
+  }
+  .skill-chip--cyan:hover,
+  .skill-chip--cyan:focus-visible {
+    border-color: var(--color-cyan);
+    box-shadow: 0 0 26px -4px color-mix(in oklab, var(--color-cyan) 85%, transparent);
+  }
+  .skill-chip--orange:hover,
+  .skill-chip--orange:focus-visible {
+    border-color: var(--color-orange);
+    box-shadow: 0 0 26px -4px color-mix(in oklab, var(--color-orange) 85%, transparent);
+  }
+  .skill-chip--dim {
+    @apply opacity-30;
+  }
+
   .grid-fade {
     background-image:
       linear-gradient(to right, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px),
@@ -169,25 +195,30 @@
   }
 }
 
-/* Static hero fallback: a CSS "planet" used when WebGL or motion is unavailable. */
+/* Static hero fallback: a soft glow plus static "particles" used when WebGL or motion is unavailable. */
 .fallback-orb {
   background:
-    radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.18), transparent 38%),
-    radial-gradient(circle at 70% 75%, rgba(103, 232, 249, 0.35), transparent 50%),
-    radial-gradient(circle at 50% 50%, #243044 0%, #141a26 70%, #0e1119 100%);
-  box-shadow:
-    0 0 60px rgba(103, 232, 249, 0.18),
-    inset -20px -20px 60px rgba(0, 0, 0, 0.55);
+    radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--color-cyan) 28%, transparent), transparent 62%),
+    radial-gradient(circle at 70% 70%, color-mix(in oklab, var(--color-orange) 18%, transparent), transparent 55%);
+  filter: blur(18px);
 }
 
-.fallback-ring {
-  border: 1px solid color-mix(in oklab, var(--color-cyan) 45%, transparent);
-  transform: rotateX(72deg);
+@media (prefers-reduced-motion: no-preference) {
+  .fallback-dot {
+    animation: fallback-twinkle 3.6s ease-in-out infinite;
+  }
 }
 
-.fallback-ring--outer {
-  border-color: color-mix(in oklab, var(--color-orange) 40%, transparent);
-  transform: rotateX(72deg) rotateZ(18deg);
+@keyframes fallback-twinkle {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

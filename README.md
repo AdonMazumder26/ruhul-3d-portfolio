@@ -10,8 +10,8 @@ ruhul-3d-portfolio/
 
 ## Features
 
-- Cinematic hero: procedural digital planet, orbit rings, dust ring and one clickable satellite per featured project (click → project page).
-- Skills constellation: a second lightweight 3D scene, lazily mounted when scrolled into view and two-way linked with the accessible category list.
+- Cinematic hero: a GPU particle cloud (~6k points, custom shader) that morphs between a sphere, a torus knot, a `</>` glyph and your initials, with one clickable marker per featured project orbiting it (click → project page).
+- Skills flow field: skill chips (real, focusable buttons) drift along Perlin-noise currents over a canvas of soft streaks; picking a category gathers its chips into a cluster and dims the rest. 2D canvas only, so it runs everywhere; reduced motion gets a static grouped map.
 - Graceful degradation: WebGL detection, device-tier heuristics, `prefers-reduced-motion`, error boundaries and CSS/SVG fallbacks. Content never depends on 3D.
 - Projects from the API with a local fallback dataset; list page with category/technology filters; detail routes with unique titles.
 - Contact form validated on the client and server (Zod), honeypot + rate limiting, persisted privately in MongoDB.
@@ -144,13 +144,13 @@ Most content is now managed from the admin panel at `/admin`:
 | Projects (create, edit, publish, feature, reorder, delete) | Admin → Projects |
 | Blog posts (Markdown, tags, cover image, draft/published) | Admin → Blog |
 | Contact submissions (read, review, archive, delete) | Admin → Inbox |
-| Site colours, fonts, hero eyebrow text, 3D on/off toggles | Admin → Theme |
+| Site colours, fonts, hero eyebrow text, 3D hero / animated skills toggles | Admin → Theme |
 
 Still edited in code (rarely changes):
 
 | What | Where |
 | --- | --- |
-| Name, headline, about text, education, social links, resume URL | `client/src/data/profile.js` |
+| Name, headline, about text, education, social links, resume URL, hero initials | `client/src/data/profile.js` |
 | Skills and categories | `client/src/data/skills.js` |
 | Journey / timeline | `client/src/data/journey.js` |
 | Project fallback data (used when the API is unavailable) | `client/src/data/fallbackProjects.js` |
@@ -167,10 +167,10 @@ client/src
   app/App.jsx                 routes
   components/layout           Navbar, Footer, Layout, ScrollManager, PageContainer
   components/ui               Button, Badge, SectionHeading, LoadingState, ErrorState, Reveal
-  components/three            HeroScene, HeroVisual, SkillsConstellation, SceneFallback, SceneErrorBoundary
+  components/three            HeroScene (particle morph), particleShapes, HeroVisual, SceneFallback, SceneErrorBoundary
   features/home               HomePage, HeroSection
   features/projects           ProjectsSection, ProjectsPage, ProjectDetailPage, ProjectCard, ProjectGrid, projectService, useProjects
-  features/skills             SkillsSection
+  features/skills             SkillsSection, SkillsFlowField (canvas + DOM chips)
   features/about              AboutSection, JourneySection
   features/contact            ContactSection, contactSchema, contactService
   features/blog               BlogPage, BlogPostPage, blogService, useBlog
@@ -201,7 +201,7 @@ server/tests/api.test.js
 
 - Three.js, R3F and drei are split into a separate chunk (`three-*.js`, ~319 KB gzipped) that is only downloaded when a scene actually mounts. The content shell is ~81 KB gzipped. Vite reports the large chunk as a warning; this is intentional.
 - The admin panel (~14 KB gzipped) and the Markdown renderer (~49 KB gzipped, shared by `/blog/:slug` and the admin editor) are lazy-loaded; normal visitors never download them.
-- Both canvases pause rendering (`frameloop="never"`) when scrolled out of view; the skills scene is not even created until it is near the viewport.
+- The hero canvas pauses rendering (`frameloop="never"`) when scrolled out of view; the skills flow field only animates while near the viewport. Particle shapes are generated once per mount (text glyphs are rasterised from an offscreen canvas).
 - Device pixel ratio is capped (1.6 desktop / 1.25 constrained). Low-tier devices, `prefers-reduced-motion`, missing WebGL and runtime errors all fall back to CSS/SVG. The owner can also force the fallbacks from Admin → Theme.
 
 ## Deployment

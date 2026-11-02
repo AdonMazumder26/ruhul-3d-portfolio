@@ -5,6 +5,8 @@
 export const profile = {
   preferredName: 'Ruhul',
   fullName: 'Ruhul Ma Ani Mazumder',
+  // Letters the hero particle cloud morphs into (1–3 characters).
+  initials: 'RM',
   brand: 'RUHUL.DEV',
   tagline: 'Beyond the Interface',
   role: 'Aspiring full-stack developer',

@@ -6,6 +6,7 @@ import { useDeviceCapability } from '../../hooks/useDeviceCapability.js'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 import { useInView } from '../../hooks/useInView.js'
 import { useTheme } from '../../features/theme/themeContext.js'
+import { profile } from '../../data/profile.js'
 
 const HeroScene = lazy(() => import('./HeroScene.jsx'))
 
@@ -49,6 +50,7 @@ export function HeroVisual({ projects, compact = false, className = '' }) {
                 colors={sceneColors}
                 stars={theme.hero.stars}
                 satellites={theme.hero.satellites}
+                initials={profile.initials || profile.preferredName?.[0] || 'R'}
                 onSelectProject={onSelectProject}
                 onReady={() => setReady(true)}
                 onError={() => setFailed(true)}

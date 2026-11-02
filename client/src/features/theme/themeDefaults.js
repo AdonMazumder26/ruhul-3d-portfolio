@@ -21,7 +21,7 @@ export const DEFAULT_THEME = Object.freeze({
     tagline: '',
   },
   skills: {
-    scene3d: true,
+    animated: true,
   },
 })
 

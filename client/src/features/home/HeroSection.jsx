@@ -77,7 +77,7 @@ export function HeroSection({ projects }) {
             className="h-[220px] w-full sm:h-[340px] lg:h-[560px]"
           />
           <p className="mt-1 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-muted lg:hidden">
-            Three orbiting markers · one per featured project
+            Living particles · three markers, one per featured project
           </p>
         </div>
       </div>

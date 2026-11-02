@@ -208,10 +208,10 @@ export function AdminThemePage() {
 
             <section className="card space-y-3 p-5 sm:p-6">
               <h2 className="text-lg">Hero & scenes</h2>
-              <Toggle label="3D hero scene" description="Off shows the lightweight CSS planet instead of WebGL." checked={draft.hero.scene3d} onChange={(value) => setHero('scene3d', value)} />
-              <Toggle label="Star field" description="Background stars behind the planet." checked={draft.hero.stars} onChange={(value) => setHero('stars', value)} disabled={!draft.hero.scene3d} />
-              <Toggle label="Project satellites" description="Clickable satellites for the first three featured projects." checked={draft.hero.satellites} onChange={(value) => setHero('satellites', value)} disabled={!draft.hero.scene3d} />
-              <Toggle label="3D skills constellation" description="Off shows the SVG skill map." checked={draft.skills.scene3d} onChange={(value) => setSkills('scene3d', value)} />
+              <Toggle label="3D hero scene" description="Off shows the lightweight CSS particle fallback instead of WebGL." checked={draft.hero.scene3d} onChange={(value) => setHero('scene3d', value)} />
+              <Toggle label="Star field" description="Background stars behind the particle cloud." checked={draft.hero.stars} onChange={(value) => setHero('stars', value)} disabled={!draft.hero.scene3d} />
+              <Toggle label="Project markers" description="Clickable markers orbiting the cloud for the first three featured projects." checked={draft.hero.satellites} onChange={(value) => setHero('satellites', value)} disabled={!draft.hero.scene3d} />
+              <Toggle label="Animated skills field" description="Off shows a static, grouped skill map." checked={draft.skills.animated} onChange={(value) => setSkills('animated', value)} />
               <TextInput
                 label="Hero eyebrow text"
                 optional

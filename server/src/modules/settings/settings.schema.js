@@ -27,7 +27,7 @@ export const DEFAULT_THEME = Object.freeze({
     tagline: '',
   },
   skills: {
-    scene3d: true,
+    animated: true,
   },
 })
 
@@ -61,7 +61,7 @@ export const themeSchema = z
       .strict(),
     skills: z
       .object({
-        scene3d: z.boolean(),
+        animated: z.boolean(),
       })
       .strict(),
   })
