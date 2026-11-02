@@ -253,6 +253,8 @@ The frontend is also compatible with a Vercel project whose **Root Directory** i
 - Output directory: `dist`
 - Framework preset: `Vite`
 
+The matching [`client/vercel.json`](./client/vercel.json) keeps direct SPA routes working when `client` is selected as Vercel's Root Directory. If Vercel still returns `NOT_FOUND` for `/admin/login`, open **Project Settings → General → Root Directory**, choose either the repository root or `client`, save, and redeploy.
+
 ### Backend
 
 Vercel hosts the frontend configuration in this repository. Deploy the Express/MongoDB API as a separate Node service (Render, Railway, Fly.io, or another Node host), then set that public HTTPS URL in Vercel as `PUBLIC_API_URL`.
