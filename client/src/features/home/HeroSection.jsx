@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button.jsx'
 import { HeroVisual } from '../../components/three/HeroVisual.jsx'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 import { scrollToId } from '../../lib/scroll.js'
+import { useTheme } from '../theme/themeContext.js'
 
 const fade = (reduced, delay) =>
   reduced
@@ -17,6 +18,8 @@ const fade = (reduced, delay) =>
 
 export function HeroSection({ projects }) {
   const reduced = usePrefersReducedMotion()
+  const { theme } = useTheme()
+  const tagline = theme.hero.tagline?.trim() || profile.tagline
 
   const onSectionLink = (event, id) => {
     event.preventDefault()
@@ -34,7 +37,7 @@ export function HeroSection({ projects }) {
       <div className="container-x grid min-h-[calc(100svh-4rem)] grid-cols-1 items-center gap-6 pb-16 pt-20 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-6 lg:pb-20 lg:pt-28">
         <div className="relative z-10 order-2 lg:order-1">
           <motion.p {...fade(reduced, 0)} className="eyebrow">
-            {profile.tagline}
+            {tagline}
           </motion.p>
           <motion.h1 {...fade(reduced, 0.08)} id="hero-title" className="mt-3 text-[2.15rem] leading-[1.05] sm:mt-4 sm:text-5xl lg:text-6xl">
             {profile.preferredName}

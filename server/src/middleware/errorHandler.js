@@ -18,6 +18,12 @@ function normalize(error) {
   if (error instanceof mongoose.Error.CastError) {
     return ApiError.badRequest('A request parameter has an invalid format.')
   }
+  if (error?.code === 11000) {
+    const field = Object.keys(error.keyPattern ?? error.keyValue ?? {})[0] ?? 'field'
+    return ApiError.conflict(`A record with this ${field} already exists.`, [
+      { field, message: `This ${field} is already in use.` },
+    ])
+  }
   if (
     error instanceof mongoose.Error.MongooseServerSelectionError ||
     error?.name === 'MongoNetworkError' ||

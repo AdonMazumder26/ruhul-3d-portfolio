@@ -3,12 +3,11 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Html, Line, useCursor } from '@react-three/drei'
 import * as THREE from 'three'
 
-const CYAN = '#67e8f9'
-const ORANGE = '#ff9d65'
+const DEFAULT_ACCENTS = { cyan: '#67e8f9', orange: '#ff9d65', surface: '#202633' }
 const DIM = '#3a4354'
 
 /** Pre-compute a hub position per group and a node position per skill. */
-function buildLayout(groups) {
+function buildLayout(groups, accents) {
   const hubs = groups.map((group, index) => {
     const angle = (index / groups.length) * Math.PI * 2 - Math.PI / 2
     const radius = 2.6
@@ -16,7 +15,7 @@ function buildLayout(groups) {
     return {
       id: group.id,
       label: group.label,
-      color: group.color === 'orange' ? ORANGE : CYAN,
+      color: group.color === 'orange' ? accents.orange : accents.cyan,
       position: new THREE.Vector3(Math.cos(angle) * radius, y, Math.sin(angle) * radius),
       skills: group.skills.map((skill, skillIndex) => {
         const local = (skillIndex / group.skills.length) * Math.PI * 2 + index
@@ -107,8 +106,8 @@ function Cluster({ hub, emphasised, muted, onHover }) {
   )
 }
 
-function Constellation({ groups, activeGroup, onHover }) {
-  const hubs = useMemo(() => buildLayout(groups), [groups])
+function Constellation({ groups, activeGroup, onHover, accents }) {
+  const hubs = useMemo(() => buildLayout(groups, accents), [groups, accents])
   const spokes = useMemo(() => hubs.map((hub) => [new THREE.Vector3(0, 0, 0), hub.position]), [hubs])
   const rig = useRef()
 
@@ -127,11 +126,11 @@ function Constellation({ groups, activeGroup, onHover }) {
     <group ref={rig}>
       <mesh>
         <icosahedronGeometry args={[0.42, 1]} />
-        <meshStandardMaterial color="#202633" emissive={CYAN} emissiveIntensity={0.15} roughness={0.5} metalness={0.4} flatShading />
+        <meshStandardMaterial color={accents.surface} emissive={accents.cyan} emissiveIntensity={0.15} roughness={0.5} metalness={0.4} flatShading />
       </mesh>
       <mesh scale={1.5}>
         <icosahedronGeometry args={[0.42, 1]} />
-        <meshBasicMaterial color={CYAN} wireframe transparent opacity={0.12} />
+        <meshBasicMaterial color={accents.cyan} wireframe transparent opacity={0.12} />
       </mesh>
       {spokes.map((pair, index) => (
         <Line key={index} points={pair} color={DIM} transparent opacity={0.5} lineWidth={1} />
@@ -149,7 +148,8 @@ function Constellation({ groups, activeGroup, onHover }) {
   )
 }
 
-export default function SkillsConstellation({ groups, activeGroup, active = true, onHover, onReady }) {
+export default function SkillsConstellation({ groups, activeGroup, active = true, colors, onHover, onReady }) {
+  const accents = useMemo(() => ({ ...DEFAULT_ACCENTS, ...(colors ?? {}) }), [colors])
   return (
     <Canvas
       dpr={[1, 1.5]}
@@ -166,7 +166,7 @@ export default function SkillsConstellation({ groups, activeGroup, active = true
     >
       <ambientLight intensity={0.5} />
       <directionalLight position={[3, 4, 5]} intensity={1.2} />
-      <Constellation groups={groups} activeGroup={activeGroup} onHover={onHover} />
+      <Constellation groups={groups} activeGroup={activeGroup} onHover={onHover} accents={accents} />
     </Canvas>
   )
 }

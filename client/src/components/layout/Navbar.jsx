@@ -5,6 +5,7 @@ import { FiMenu, FiX } from 'react-icons/fi'
 import { profile, hasLink } from '../../data/profile.js'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 import { scrollToId } from '../../lib/scroll.js'
+import { apiConfigured } from '../../lib/api.js'
 
 const SECTION_LINKS = [
   { id: 'projects', label: 'Projects' },
@@ -148,6 +149,18 @@ export function Navbar() {
               </li>
             )
           })}
+          {apiConfigured ? (
+            <li>
+              <NavLink to="/blog" className={({ isActive }) => linkClass(isActive)}>
+                {({ isActive }) => (
+                  <>
+                    Blog
+                    {activeDot(isActive)}
+                  </>
+                )}
+              </NavLink>
+            </li>
+          ) : null}
           {hasLink(profile.links.resume) ? (
             <li className="ml-2">
               <a
@@ -211,6 +224,17 @@ export function Navbar() {
                   All projects
                 </Link>
               </li>
+              {apiConfigured ? (
+                <li>
+                  <Link
+                    to="/blog"
+                    onClick={() => setOpen(false)}
+                    className="block min-h-11 rounded-md px-3 py-3 text-base font-medium text-muted hover:text-text"
+                  >
+                    Blog
+                  </Link>
+                </li>
+              ) : null}
               {hasLink(profile.links.resume) ? (
                 <li>
                   <a

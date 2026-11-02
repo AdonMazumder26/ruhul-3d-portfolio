@@ -3,16 +3,17 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, Html, Stars, useCursor } from '@react-three/drei'
 import * as THREE from 'three'
 
-const COLORS = {
+const DEFAULT_COLORS = {
   surface: '#202633',
   cyan: '#67e8f9',
   orange: '#ff9d65',
   muted: '#a1a8b5',
+  bg: '#0b0d12',
 }
 
 const SATELLITE_SHAPES = ['octahedron', 'box', 'dodecahedron']
 
-function Planet({ detail }) {
+function Planet({ detail, colors }) {
   const wire = useRef()
   useFrame((_, delta) => {
     if (wire.current) wire.current.rotation.y += delta * 0.04
@@ -25,11 +26,11 @@ function Planet({ detail }) {
       </mesh>
       <mesh ref={wire} scale={1.035}>
         <icosahedronGeometry args={[1.45, 1]} />
-        <meshBasicMaterial color={COLORS.cyan} wireframe transparent opacity={0.12} />
+        <meshBasicMaterial color={colors.cyan} wireframe transparent opacity={0.12} />
       </mesh>
       <mesh scale={1.18}>
         <sphereGeometry args={[1.45, 32, 32]} />
-        <meshBasicMaterial color={COLORS.cyan} transparent opacity={0.045} side={THREE.BackSide} depthWrite={false} />
+        <meshBasicMaterial color={colors.cyan} transparent opacity={0.045} side={THREE.BackSide} depthWrite={false} />
       </mesh>
     </group>
   )
@@ -56,7 +57,7 @@ function mulberry32(seed) {
   }
 }
 
-function DustRing({ count, radius }) {
+function DustRing({ count, radius, color }) {
   const positions = useMemo(() => {
     const random = mulberry32(count * 31 + Math.round(radius * 100))
     const array = new Float32Array(count * 3)
@@ -80,7 +81,7 @@ function DustRing({ count, radius }) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial color={COLORS.muted} size={0.022} sizeAttenuation transparent opacity={0.7} depthWrite={false} />
+      <pointsMaterial color={color} size={0.022} sizeAttenuation transparent opacity={0.7} depthWrite={false} />
     </points>
   )
 }
@@ -91,13 +92,13 @@ function SatelliteShape({ shape }) {
   return <octahedronGeometry args={[0.2, 0]} />
 }
 
-function Satellite({ project, index, total, radius, tilt, onSelect, speed }) {
+function Satellite({ project, index, total, radius, tilt, onSelect, speed, colors }) {
   const group = useRef()
   const mesh = useRef()
   const [hovered, setHovered] = useState(false)
   useCursor(hovered)
   const offset = (index / total) * Math.PI * 2
-  const accent = index % 2 === 0 ? COLORS.cyan : COLORS.orange
+  const accent = index % 2 === 0 ? colors.cyan : colors.orange
 
   useFrame(({ clock }, delta) => {
     const t = clock.getElapsedTime() * speed + offset
@@ -161,9 +162,9 @@ function Rig({ children, parallax }) {
   return <group ref={ref}>{children}</group>
 }
 
-function Scene({ projects, tier, onSelectProject, compact }) {
+function Scene({ projects, tier, onSelectProject, compact, colors, stars, satellites }) {
   const detail = tier === 'high' ? 2 : 1
-  const starCount = tier === 'high' ? 1400 : tier === 'medium' ? 700 : 0
+  const starCount = !stars ? 0 : tier === 'high' ? 1400 : tier === 'medium' ? 700 : 0
   const dustCount = tier === 'high' ? 520 : 260
   const orbitTilt = [0.42, 0, 0.18]
   const outerTilt = [0.62, 0.3, -0.25]
@@ -172,30 +173,33 @@ function Scene({ projects, tier, onSelectProject, compact }) {
   return (
     <>
       <ambientLight intensity={0.55} />
-      <hemisphereLight args={['#9fd9e6', '#0b0d12', 0.5]} />
+      <hemisphereLight args={['#9fd9e6', colors.bg, 0.5]} />
       <directionalLight position={[3, 4, 6]} intensity={3} color="#dffbff" />
-      <pointLight position={[-5, -3, -2]} intensity={18} color={COLORS.orange} distance={14} />
+      <pointLight position={[-5, -3, -2]} intensity={18} color={colors.orange} distance={14} />
       {starCount > 0 ? <Stars radius={60} depth={40} count={starCount} factor={3} saturation={0} fade speed={0.35} /> : null}
 
       <Rig parallax={tier !== 'low'}>
         <Float speed={1.1} rotationIntensity={0.15} floatIntensity={0.35}>
           <group scale={scale}>
-            <Planet detail={detail} />
-            <OrbitRing radius={2.5} color={COLORS.cyan} tilt={orbitTilt} />
-            <OrbitRing radius={3.3} color={COLORS.orange} tilt={outerTilt} opacity={0.28} />
-            <DustRing count={dustCount} radius={2.5} />
-            {projects.map((project, index) => (
-              <Satellite
-                key={project.slug}
-                project={project}
-                index={index}
-                total={projects.length}
-                radius={index === 1 ? 3.3 : 2.5}
-                tilt={index === 1 ? outerTilt : orbitTilt}
-                speed={index === 1 ? 0.14 : 0.2}
-                onSelect={onSelectProject}
-              />
-            ))}
+            <Planet detail={detail} colors={colors} />
+            <OrbitRing radius={2.5} color={colors.cyan} tilt={orbitTilt} />
+            <OrbitRing radius={3.3} color={colors.orange} tilt={outerTilt} opacity={0.28} />
+            <DustRing count={dustCount} radius={2.5} color={colors.muted} />
+            {satellites
+              ? projects.map((project, index) => (
+                  <Satellite
+                    key={project.slug}
+                    project={project}
+                    index={index}
+                    total={projects.length}
+                    radius={index === 1 ? 3.3 : 2.5}
+                    tilt={index === 1 ? outerTilt : orbitTilt}
+                    speed={index === 1 ? 0.14 : 0.2}
+                    onSelect={onSelectProject}
+                    colors={colors}
+                  />
+                ))
+              : null}
           </group>
         </Float>
       </Rig>
@@ -208,7 +212,19 @@ function Scene({ projects, tier, onSelectProject, compact }) {
  * featured project. Satellites are clickable landmarks; the same projects are
  * always available as HTML in the Projects section.
  */
-export default function HeroScene({ projects = [], tier = 'high', active = true, compact = false, onSelectProject, onReady, onError }) {
+export default function HeroScene({
+  projects = [],
+  tier = 'high',
+  active = true,
+  compact = false,
+  colors: colorOverrides,
+  stars = true,
+  satellites = true,
+  onSelectProject,
+  onReady,
+  onError,
+}) {
+  const colors = useMemo(() => ({ ...DEFAULT_COLORS, ...(colorOverrides ?? {}) }), [colorOverrides])
   return (
     <Canvas
       dpr={[1, tier === 'high' ? 1.6 : 1.25]}
@@ -227,7 +243,15 @@ export default function HeroScene({ projects = [], tier = 'high', active = true,
       aria-hidden="true"
       tabIndex={-1}
     >
-      <Scene projects={projects} tier={tier} compact={compact} onSelectProject={onSelectProject} />
+      <Scene
+        projects={projects}
+        tier={tier}
+        compact={compact}
+        colors={colors}
+        stars={stars}
+        satellites={satellites}
+        onSelectProject={onSelectProject}
+      />
     </Canvas>
   )
 }

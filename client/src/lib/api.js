@@ -31,6 +31,8 @@ export async function apiRequest(path, { method = 'GET', body, timeoutMs = 10000
       method,
       headers: body ? { 'Content-Type': 'application/json' } : undefined,
       body: body ? JSON.stringify(body) : undefined,
+      // Admin session is an httpOnly cookie; harmless for public routes.
+      credentials: 'include',
       signal: controller.signal,
     })
 

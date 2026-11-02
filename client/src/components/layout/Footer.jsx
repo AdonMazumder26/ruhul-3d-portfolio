@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { FiGithub, FiLinkedin, FiMail } from 'react-icons/fi'
 import { profile, socialLinks } from '../../data/profile.js'
+import { apiConfigured } from '../../lib/api.js'
 
 const icons = { github: FiGithub, linkedin: FiLinkedin, email: FiMail }
 
@@ -29,6 +30,11 @@ export function Footer() {
           <Link className="text-muted hover:text-text py-1" to="/projects">
             All projects
           </Link>
+          {apiConfigured ? (
+            <Link className="text-muted hover:text-text py-1" to="/blog">
+              Blog
+            </Link>
+          ) : null}
           <Link className="text-muted hover:text-text py-1" to="/#skills">
             Skills
           </Link>

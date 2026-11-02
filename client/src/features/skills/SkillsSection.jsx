@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useMemo, useState } from 'react'
 import { SectionHeading } from '../../components/ui/SectionHeading.jsx'
 import { Badge } from '../../components/ui/Badge.jsx'
 import { Reveal } from '../../components/ui/Reveal.jsx'
@@ -7,17 +7,23 @@ import { skillGroups, focusLabels } from '../../data/skills.js'
 import { useDeviceCapability } from '../../hooks/useDeviceCapability.js'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 import { useInView } from '../../hooks/useInView.js'
+import { useTheme } from '../theme/themeContext.js'
 
 const SkillsConstellation = lazy(() => import('../../components/three/SkillsConstellation.jsx'))
 
 function ConstellationPanel({ activeGroup, onHover }) {
   const reduced = usePrefersReducedMotion()
   const { webgl, tier } = useDeviceCapability()
+  const { theme } = useTheme()
   const [failed, setFailed] = useState(false)
   const [mountRef, nearViewport] = useInView({ rootMargin: '200px', once: true })
   const [visibleRef, visible] = useInView({ rootMargin: '80px' })
 
-  const use3D = webgl && !reduced && !failed && tier !== 'low'
+  const use3D = theme.skills.scene3d && webgl && !reduced && !failed && tier !== 'low'
+  const sceneColors = useMemo(
+    () => ({ cyan: theme.colors.accent, orange: theme.colors.accentAlt, surface: theme.colors.elevated }),
+    [theme.colors],
+  )
 
   return (
     <div
@@ -32,7 +38,13 @@ function ConstellationPanel({ activeGroup, onHover }) {
         <SceneErrorBoundary fallback={<StaticConstellation />} onError={() => setFailed(true)}>
           <Suspense fallback={<StaticConstellation />}>
             <div className="absolute inset-0">
-              <SkillsConstellation groups={skillGroups} activeGroup={activeGroup} active={visible} onHover={onHover} />
+              <SkillsConstellation
+                groups={skillGroups}
+                activeGroup={activeGroup}
+                active={visible}
+                colors={sceneColors}
+                onHover={onHover}
+              />
             </div>
           </Suspense>
         </SceneErrorBoundary>
@@ -57,10 +69,10 @@ function StaticConstellation() {
         const angle = (index / groups.length) * Math.PI * 2 - Math.PI / 2
         const hx = cx + Math.cos(angle) * 125
         const hy = cy + Math.sin(angle) * 110
-        const color = group.color === 'orange' ? '#ff9d65' : '#67e8f9'
+        const color = group.color === 'orange' ? 'var(--color-orange)' : 'var(--color-cyan)'
         return (
           <g key={group.id}>
-            <line x1={cx} y1={cy} x2={hx} y2={hy} stroke="#2a3140" />
+            <line x1={cx} y1={cy} x2={hx} y2={hy} stroke="var(--color-border)" />
             {group.skills.map((skill, skillIndex) => {
               const local = (skillIndex / group.skills.length) * Math.PI * 2 + index
               const sx = hx + Math.cos(local) * 34
@@ -76,7 +88,7 @@ function StaticConstellation() {
           </g>
         )
       })}
-      <circle cx={cx} cy={cy} r="14" fill="#202633" stroke="#67e8f9" strokeOpacity="0.6" />
+      <circle cx={cx} cy={cy} r="14" fill="var(--color-elevated)" stroke="var(--color-cyan)" strokeOpacity="0.6" />
     </svg>
   )
 }

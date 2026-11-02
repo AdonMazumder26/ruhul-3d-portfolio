@@ -14,8 +14,8 @@ export function AboutSection() {
               className="absolute inset-[7%] rounded-full border border-cyan/35"
               style={{ transform: 'rotate(-18deg) scaleY(0.92)' }}
             />
-            <span aria-hidden="true" className="absolute left-[6%] top-[28%] size-2.5 rounded-full bg-orange shadow-[0_0_14px_#FF9D65]" />
-            <span aria-hidden="true" className="absolute bottom-[14%] right-[10%] size-2 rounded-full bg-cyan shadow-[0_0_14px_#67E8F9]" />
+            <span aria-hidden="true" className="absolute left-[6%] top-[28%] size-2.5 rounded-full bg-orange shadow-[0_0_14px_var(--color-orange)]" />
+            <span aria-hidden="true" className="absolute bottom-[14%] right-[10%] size-2 rounded-full bg-cyan shadow-[0_0_14px_var(--color-cyan)]" />
             <div className="absolute inset-[14%] overflow-hidden rounded-full border border-border bg-surface shadow-[0_30px_80px_-30px_rgba(103,232,249,0.35)]">
               <img
                 src={profile.avatar.src}

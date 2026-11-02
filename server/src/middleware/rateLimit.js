@@ -17,3 +17,12 @@ export const contactLimiter = rateLimit({
   legacyHeaders: false,
   message: { ...message, message: 'Too many messages were sent from this connection. Please try again in an hour.' },
 })
+
+export const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { ...message, message: 'Too many login attempts. Please wait 15 minutes and try again.' },
+})
